@@ -1,3 +1,7 @@
+# WebSocket-Client
+
+This is a demo for [Socketto](https://github.com/karsanda/socketto), a tiny WebSocket library
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
