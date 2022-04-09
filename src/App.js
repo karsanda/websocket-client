@@ -18,24 +18,31 @@ function App() {
   function open() {
     ws = openConnection('ws://localhost:8080/connect', {
       onOpen: () => printOutput('OPEN'),
-      onClose: () => printOutput('CLOSE'),
+      onConnectFailed: () => printOutput('FAILED TO CONNECT'),
       onMessage: (e) => printOutput(`RESPONSE: ${e.data}`),
       onError: (e) => printOutput(`ERROR: ${e.data}`)
     })
   }
 
   function close() {
-    ws.close()
+    if (ws) {
+      printOutput(`CLOSE CONNECTION`)
+      ws.close()
+      ws = undefined
+    } else {
+      printOutput(`NO CONNECTION`)
+    }
   }
 
   function send() {
     printOutput(`SEND: ${value}`)
-    ws.sendMessage(value)
+    ws.send(value)
   }
 
   return (
     <>
       <div>
+        <h3>WebSocket Client</h3>
         <p>
           Click "Open" to create a connection to the server,
           "Send" to send a message to the server and "Close" to close the connection.
