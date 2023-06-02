@@ -1,11 +1,22 @@
-import React, { useState } from 'react'
-import { openConnection } from 'socketto'
+import { useState, useRef } from 'react'
+import Socketto from 'socketto'
 
-let ws
+function useWebSocket(url, options) {
+  let ws = useRef(new Socketto(url,options))
+  return ws.current
+}
 
 function App() {
   const [value, setValue] = useState('')
   const [output, setOutput] = useState([])
+
+  const ws = useWebSocket('ws://localhost:8080/connect', {
+    onOpen: () => printOutput('OPEN'),
+    onReconnect: () => printOutput('RECONNECT'),
+    onMessage: (e) => printOutput(`RESPONSE: ${e.data}`),
+    onRetry: () => { printOutput('RETRY TO CONNECT') },
+    onFailed: () => { printOutput('FAILED TO CONNECT') }
+  })
 
   function handleChange(e) {
     setValue(e.target.value)
@@ -16,19 +27,13 @@ function App() {
   }
 
   function open() {
-    ws = openConnection('ws://localhost:8080/connect', {
-      onOpen: () => printOutput('OPEN'),
-      onConnectFailed: () => printOutput('FAILED TO CONNECT'),
-      onMessage: (e) => printOutput(`RESPONSE: ${e.data}`),
-      onError: (e) => printOutput(`ERROR: ${e.data}`)
-    })
+    ws.createConnection()
   }
 
   function close() {
     if (ws) {
       printOutput(`CLOSE CONNECTION`)
-      ws.close()
-      ws = undefined
+      ws.closeConnection()
     } else {
       printOutput(`NO CONNECTION`)
     }
